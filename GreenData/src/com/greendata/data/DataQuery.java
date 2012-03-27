@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class DataQuery implements Parcelable{
+public class DataQuery {
 	TreeMap<String, String> mParams;
 	public DataQuery(TreeMap<String, String> params) {
 		mParams = params;
@@ -37,31 +37,31 @@ public class DataQuery implements Parcelable{
 		return mParams.hashCode();
 	}
 
-	private DataQuery(Parcel in) {
-		if (mParams == null) {
-			mParams = new TreeMap<String, String>();
-		}
-		in.readMap(mParams, TreeMap.class.getClassLoader());
-	}
+//	private DataQuery(Parcel in) {
+//		if (mParams == null) {
+//			mParams = new TreeMap<String, String>();
+//		}
+//		in.readMap(mParams, TreeMap.class.getClassLoader());
+//	}
 	
-	@Override
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeMap(mParams);
-	}
-	
-	public static final Parcelable.Creator<DataQuery> CREATOR = new Parcelable.Creator<DataQuery>() {
-		public DataQuery createFromParcel(final Parcel in) {
-			return new DataQuery(in);
-		}
-
-		public DataQuery[] newArray(final int size) {
-			return new DataQuery[size];
-		}
-	};
+//	@Override
+//	public int describeContents() {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
+//
+//	@Override
+//	public void writeToParcel(Parcel dest, int flags) {
+//		dest.writeMap(mParams);
+//	}
+//	
+//	public static final Parcelable.Creator<DataQuery> CREATOR = new Parcelable.Creator<DataQuery>() {
+//		public DataQuery createFromParcel(final Parcel in) {
+//			return new DataQuery(in);
+//		}
+//
+//		public DataQuery[] newArray(final int size) {
+//			return new DataQuery[size];
+//		}
+//	};
 }

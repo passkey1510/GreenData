@@ -1,5 +1,6 @@
 package com.greendata.app;
 
+import com.greendata.configuration.RequestConfiguration;
 import com.greendata.data.DataParser;
 import com.greendata.data.DataQuery;
 import com.greendata.data.DataResults;
@@ -66,7 +67,7 @@ public class GreenDataActivity extends Activity implements
 			} else {
 				mOnRequestDataListener
 						.onGetDataCompleted((DataResults) payload
-								.getParcelable(GreenDataRequestManager.RECEIVER_EXTRA_VIDEO_LIST));
+								.getParcelable("results"));
 			}
 		}
 	}
@@ -76,6 +77,7 @@ public class GreenDataActivity extends Activity implements
 		if (mOnRequestDataListener != null) {
 			mOnRequestDataListener.onGetData();
 		}
-		mRequestId = mRequestManager.getData(worker, query);
+		final RequestConfiguration configuration = new RequestConfiguration(worker, query);
+		mRequestId = mRequestManager.getData(configuration);
 	}
 }

@@ -14,6 +14,8 @@ import android.os.ResultReceiver;
 import android.util.SparseArray;
 
 import com.foxykeep.datadroid.requestmanager.RequestManager;
+import com.greendata.configuration.RequestConfiguration;
+import com.greendata.configuration.GreenDataConfiguration;
 import com.greendata.data.DataParser;
 import com.greendata.data.DataQuery;
 import com.greendata.data.service.DataService;
@@ -48,7 +50,8 @@ public class GreenDataRequestManager extends RequestManager{
     @SuppressWarnings("unused")
     private EvalReceiver mEvalReceiver = new EvalReceiver(mHandler);
 	private MemoryProvider mMemoryProvider = MemoryProvider.getInstance();
-
+	private GreenDataConfiguration mConfiguration = GreenDataConfiguration.getInstance();
+	
     private GreenDataRequestManager(final Context context) {
         mContext = context.getApplicationContext();
         mRequestSparseArray = new SparseArray<Intent>();
@@ -145,14 +148,14 @@ public class GreenDataRequestManager extends RequestManager{
         // Get the request Id
         final int requestId = resultData.getInt(RECEIVER_EXTRA_REQUEST_ID);
 
-        if (resultCode == DataService.SUCCESS_CODE) {
-            final Intent intent = mRequestSparseArray.get(requestId);
-            switch (intent.getIntExtra(DataService.INTENT_EXTRA_WORKER_TYPE, -1)) {
-//                case DataService.WORKER_TYPE_YOUTUBE_LIST:
-//                    mMemoryProvider.mediaResults = resultData.getParcelable(RECEIVER_EXTRA_VIDEO_LIST);
-//                    break;
-            }
-        }
+//        if (resultCode == DataService.SUCCESS_CODE) {
+//            final Intent intent = mRequestSparseArray.get(requestId);
+//            switch (intent.getIntExtra(DataService.INTENT_EXTRA_WORKER_TYPE, -1)) {
+////                case DataService.WORKER_TYPE_YOUTUBE_LIST:
+////                    mMemoryProvider.mediaResults = resultData.getParcelable(RECEIVER_EXTRA_VIDEO_LIST);
+////                    break;
+//            }
+//        }
         // Remove the request Id from the "in progress" request list
         mRequestSparseArray.remove(requestId);
 
@@ -234,15 +237,19 @@ public class GreenDataRequestManager extends RequestManager{
 //		return getYouTubeVideoList(1, 50);
 //	}
 
-	public int getData(DataWorker worker, DataQuery query) {
+	public int getData(RequestConfiguration configuration) {
 		// A request is identified by a worker and query
-		final String uid = worker.hashCode() + "@" + query.hashCode();
+		final String uid = configuration.getId();
+		
+		// Put a request configuration to global configuration
+		mConfiguration.getConfiguration().put(uid, configuration);
+		
 		// Check if a match to this request is already launched
         final int requestSparseArrayLength = mRequestSparseArray.size();
         for (int i = 0; i < requestSparseArrayLength; i++) {
             final Intent savedIntent = mRequestSparseArray.valueAt(i);
 
-            if (savedIntent.getStringExtra(DataService.INTENT_EXTRA_WORKER_TYPE) != uid) {
+            if (savedIntent.getStringExtra(DataService.INTENT_EXTRA_CONFIGURATION_ID) != uid) {
                 continue;
             }
             return mRequestSparseArray.keyAt(i);
@@ -251,11 +258,9 @@ public class GreenDataRequestManager extends RequestManager{
         final int requestId = sRandom.nextInt(MAX_RANDOM_REQUEST_ID);
 
         final Intent intent = new Intent(mContext, DataService.class);
-        intent.putExtra(DataService.INTENT_EXTRA_WORKER_TYPE, uid);
         intent.putExtra(DataService.INTENT_EXTRA_RECEIVER, mEvalReceiver);
         intent.putExtra(DataService.INTENT_EXTRA_REQUEST_ID, requestId);
-        intent.putExtra(DataService.INTENT_EXTRA_WORKER, worker);
-        intent.putExtra(DataService.INTENT_EXTRA_QUERY, query);
+        intent.putExtra(DataService.INTENT_EXTRA_CONFIGURATION_ID, uid);
         mContext.startService(intent);
 
         mRequestSparseArray.append(requestId, intent);
