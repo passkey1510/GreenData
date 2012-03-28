@@ -1,12 +1,17 @@
 package com.greendata.demo;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,14 +55,48 @@ public class GreenDataTwitterListActivity extends GreenDataListActivity<TweetIte
 
 	@Override
 	public DataQuery getRefreshQuery() {
+		DataQuery currentQuery = getCurrentQuery();
+		DataResults<TweetItem> results = (DataResults<TweetItem>) getLastResults();
+//		results.getRawResponse();
+		try {
+			JSONObject resultObj = new JSONObject(results.getRawResponse());
+			String refreshUrl = resultObj.getString("refresh_url");
+			List<NameValuePair> params = URLEncodedUtils.parse(new URI(refreshUrl), HTTP.UTF_8);
+			for (NameValuePair nameValuePair : params) {
+				currentQuery.putParam(nameValuePair.getName(), nameValuePair.getValue());
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// TODO Auto-generated method stub
-		return null;
+		return currentQuery;
 	}
 
 	@Override
 	public DataQuery getLoadMoreQuery() {
+		DataQuery currentQuery = getCurrentQuery();
+		DataResults<TweetItem> results = (DataResults<TweetItem>) getLastResults();
+//		results.getRawResponse();
+		try {
+			JSONObject resultObj = new JSONObject(results.getRawResponse());
+			String nextPage = resultObj.getString("next_page");
+			List<NameValuePair> params = URLEncodedUtils.parse(new URI(nextPage), HTTP.UTF_8);
+			for (NameValuePair nameValuePair : params) {
+				currentQuery.putParam(nameValuePair.getName(), nameValuePair.getValue());
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// TODO Auto-generated method stub
-		return null;
+		return currentQuery;
 	}
 	
     /** Called when the activity is first created. */
@@ -65,7 +104,7 @@ public class GreenDataTwitterListActivity extends GreenDataListActivity<TweetIte
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TreeMap<String, String> params = new TreeMap<String, String>();
-        params.put("q", "android");
+        params.put("q", "appoke");
 //        params.put("max-results", "5");
 //        params.put("alt", "jsonc");
 //        params.put("v", "2");

@@ -11,6 +11,7 @@ import com.greendata.requestmanager.GreenDataRequestManager.OnRequestFinishedLis
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Parcelable;
 
 public class GreenDataActivity extends Activity implements
 		OnRequestFinishedListener {
@@ -18,13 +19,13 @@ public class GreenDataActivity extends Activity implements
 	private GreenDataRequestManager mRequestManager;
 	private OnRequestDataListener mOnRequestDataListener;
 	protected int mRequestId;
-	private String mRawResponse;
 	private DataQuery mCurrentQuery;
+	private DataResults<? extends Parcelable> mLastResults;
 	
 	public interface OnRequestDataListener {
 		public void onGetData();
 
-		public void onGetDataCompleted(DataResults results);
+		public void onGetDataCompleted(DataResults<? extends Parcelable> results);
 
 		public void getDataComplete();
 	}
@@ -67,16 +68,15 @@ public class GreenDataActivity extends Activity implements
 					// showDialog(DialogConfig.DIALOG_CONNEXION_ERROR);
 				}
 			} else {
-				final DataResults dataResults = (DataResults) payload.getParcelable("results");
-				mRawResponse = dataResults.getRawResponse();
+				mLastResults = (DataResults<? extends Parcelable>) payload.getParcelable("results");
 				mOnRequestDataListener
-						.onGetDataCompleted(dataResults);
+						.onGetDataCompleted(mLastResults);
 			}
 		}
 	}
 
-	public String getRawResponse() {
-		return mRawResponse;
+	public DataResults<? extends Parcelable> getLastResults() {
+		return mLastResults;
 	}
 	
 	public void setCurrentQuery(DataQuery query) {
