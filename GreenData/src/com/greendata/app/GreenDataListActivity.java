@@ -33,7 +33,7 @@ public class GreenDataListActivity<E extends Parcelable> extends
 		GreenDataActivity implements OnRequestDataListener {
 	private static final int DEFAULT_THRESHOLD = 5;
 	private RefreshAndLoadMoreListView mListView;
-	private ArrayAdapter<E> mAdapter;
+	private GreenDataAdapter<E> mAdapter;
 
 	private int mThreshold = DEFAULT_THRESHOLD;
 	private boolean mIsFirstLoad = true;
@@ -113,19 +113,14 @@ public class GreenDataListActivity<E extends Parcelable> extends
 
 			@Override
 			public void onRefresh() {
-				doGetList(new DataQuery(new TreeMap<String, String>() {
-					/**
-					 * 
-					 */
-					private static final long serialVersionUID = -5957690356117127223L;
-
-					{
-						put("v", "2");
-						put("alt", "jsonc");
-						put("start-index", "1");
-						put("maxResuls", String.valueOf(mThreshold));
-					}
-				}));
+//				final TreeMap<String, String> refreshParams = new TreeMap<String, String>();
+//				refreshParams.put("v", "2");
+//				refreshParams.put("alt", "jsonc");
+//				refreshParams.put("start-index", "1");
+//				refreshParams.put("max-results", String.valueOf(mThreshold));
+//				DataQuery refreshQuery = new DataQuery(refreshParams);
+				DataQuery refreshQuery = mAdapter.buildRefreshQuery(null);
+				doGetList(refreshQuery);
 			}
 		});
 
@@ -133,14 +128,19 @@ public class GreenDataListActivity<E extends Parcelable> extends
 
 			@Override
 			public void onLoadMore() {
-				// final int itemCount = mMediaAdapter.getCount();
-				// if (mMediaAdapter.getMaximumItemCount() ==
-				// MediaAdapter.UNLIMITED
-				// || itemCount < mMediaAdapter.getMaximumItemCount()) {
-				// getVideoList(itemCount + 1, mThreshold);
-				// } else {
-				// mVideoListView.completeLoadMore();
-				// }
+				int itemCount = mAdapter.getCount();
+				final TreeMap<String, String> loadMoreParams = new TreeMap<String, String>();
+				loadMoreParams.put("v", "2");
+				loadMoreParams.put("alt", "jsonc");
+				loadMoreParams.put("start-index", String.valueOf(++itemCount));
+				loadMoreParams.put("max-results", String.valueOf(mThreshold));
+				DataQuery loadMoreQuery = new DataQuery(loadMoreParams);
+				if (mAdapter.getMaximumItemCount() == GreenDataAdapter.UNLIMITED
+						|| itemCount < mAdapter.getMaximumItemCount()) {
+					doGetList(loadMoreQuery);
+				} else {
+					mListView.completeLoadMore();
+				}
 			}
 		});
 		if (mFinishedStart) {
@@ -158,11 +158,11 @@ public class GreenDataListActivity<E extends Parcelable> extends
 		mThreshold = threshold;
 	}
 
-	public ArrayAdapter getListAdapter() {
+	public GreenDataAdapter<E> getListAdapter() {
 		return mAdapter;
 	}
 
-	public void setListAdapter(ArrayAdapter adapter) {
+	public void setListAdapter(GreenDataAdapter<E> adapter) {
 		synchronized (this) {
 			ensureList();
 			mAdapter = adapter;
@@ -206,14 +206,15 @@ public class GreenDataListActivity<E extends Parcelable> extends
 	public void onGetDataCompleted(DataResults results) {
 		List<E> items = results.getList();
 		final boolean isRefreshing = mListView.getIsRefreshing();
-		int index = 0;
-		for (E e : items) {
-			if (isRefreshing) {
-				mAdapter.insert(e, index++);
-			} else {
-				mAdapter.add(e);
-			}
+		mAdapter.setMaximumItemCount(results.getTotalItem());
+		// int index = 0;
+		// for (E e : items) {
+		if (isRefreshing) {
+			mAdapter.prependAll(items);
+		} else {
+			mAdapter.appendAll(items);
 		}
+		// }
 		if (isRefreshing) {
 			mListView.completeRefreshing();
 		} else {
@@ -221,7 +222,7 @@ public class GreenDataListActivity<E extends Parcelable> extends
 		}
 		if (mIsFirstLoad) {
 			mIsFirstLoad = false;
-		} 
+		}
 		mAdapter.notifyDataSetChanged();
 	}
 

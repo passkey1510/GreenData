@@ -14,13 +14,13 @@ import org.json.JSONObject;
 import com.foxykeep.datadroid.exception.RestClientException;
 import com.greendata.app.GreenDataAdapter;
 import com.greendata.app.GreenDataListActivity;
-import com.greendata.data.DataPager;
 import com.greendata.data.DataParser;
 import com.greendata.data.DataQuery;
 import com.greendata.data.DataResults;
 import com.greendata.data.GreenRequest;
 import com.greendata.data.service.DataService;
 import com.greendata.data.worker.DataWorker;
+import com.greendata.demo.entities.TweetItem;
 import com.greendata.demo.entities.YouTubeItem;
 
 import android.content.Context;
@@ -34,7 +34,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class GreenDataDemoListActivity extends GreenDataListActivity<YouTubeItem> {
+public class GreenDataTweetListActivity extends GreenDataListActivity<TweetItem> {
 	
     /** Called when the activity is first created. */
     @Override
@@ -50,7 +50,7 @@ public class GreenDataDemoListActivity extends GreenDataListActivity<YouTubeItem
 //        DataWorker worker = new DataWorker("http://gdata.youtube.com/feeds/api/standardfeeds/top_rated", parser);
 //        setWorker(worker);
 //        doGetList(query);
-        GreenDataAdapter<YouTubeItem> adapter = new GreenDataAdapter<YouTubeItem>(this);
+        GreenDataAdapter<TweetItem> adapter = new GreenDataAdapter<TweetItem>(this);
         setListAdapter(adapter);
         doGetList(new GreenRequest("http://gdata.youtube.com/feeds/api/standardfeeds/top_rated", params, new DataParser() {
 			
@@ -88,69 +88,4 @@ public class GreenDataDemoListActivity extends GreenDataListActivity<YouTubeItem
 				}
 		}}));
     }
-    
-    private final class YouTubeDataPager implements DataPager {
-    	GreenDataAdapter<YouTubeItem> mAdapter;
-		@Override
-		public DataQuery buildFirstPageQuery(DataQuery query) {
-			query.getParams().put("start-index", "1");
-			return query;
-		}
-
-		@Override
-		public DataQuery buildNextPageQuery(DataQuery query) {
-//			query.getParams().put("start-index", value);
-			return null;
-		}
-
-		@Override
-		public DataQuery buildPreviousPageQuery(DataQuery query) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public DataQuery buildRefreshQuery(DataQuery query) {
-			return buildFirstPageQuery(query);
-		}
-    }
-    
-    private final class YouTubeDataAdapter extends GreenDataAdapter<YouTubeItem> {
-
-		public YouTubeDataAdapter(Context context) {
-			super(context);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		public DataQuery buildFirstPageQuery(DataQuery query) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public DataQuery buildNextPageQuery(DataQuery query) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public DataQuery buildPreviousPageQuery(DataQuery query) {
-			DataQuery currentQuery = getCurrentQuery();
-			final TreeMap<String, String> params = currentQuery.getParams();
-			params.put("start-index", "1");
-			return currentQuery;
-		}
-
-		@Override
-		public DataQuery buildRefreshQuery(DataQuery query) {
-			DataQuery currentQuery = getCurrentQuery();
-			final TreeMap<String, String> params = currentQuery.getParams();
-			params.put("start-index", "1");
-			return currentQuery;
-		}
-
-    	
-    }
-    
 }
