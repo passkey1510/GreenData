@@ -34,7 +34,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class GreenDataDemoListActivity extends GreenDataListActivity<YouTubeItem> {
+public class GreenDataYouTubeListActivity extends GreenDataListActivity<YouTubeItem> {
 	
     /** Called when the activity is first created. */
     @Override
@@ -56,6 +56,7 @@ public class GreenDataDemoListActivity extends GreenDataListActivity<YouTubeItem
 			
 			@Override
 			public DataResults<YouTubeItem> parseResult(String wsResponse) {
+				DataResults<YouTubeItem> mediaResults = (DataResults<YouTubeItem>) super.parseResult(wsResponse);
 				final ArrayList<YouTubeItem> videoList = new ArrayList<YouTubeItem>();
 				try{
 					final JSONObject parser = new JSONObject(wsResponse);
@@ -76,11 +77,11 @@ public class GreenDataDemoListActivity extends GreenDataListActivity<YouTubeItem
 					final int totalItem = root.getInt("totalItems");
 					final int offset = root.getInt("startIndex");
 					final int limit = root.getInt("itemsPerPage");
-					DataResults<YouTubeItem> mediaResults = new DataResults<YouTubeItem>();
+					
 					mediaResults.setList(videoList);
-					mediaResults.setTotalItem(totalItem);
-					mediaResults.setOffset(offset);
-					mediaResults.setLimit(limit);
+//					mediaResults.setTotalItem(totalItem);
+//					mediaResults.setOffset(offset);
+//					mediaResults.setLimit(limit);
 					return mediaResults;
 				}
 				catch(JSONException exception){
@@ -89,68 +90,34 @@ public class GreenDataDemoListActivity extends GreenDataListActivity<YouTubeItem
 		}}));
     }
     
-    private final class YouTubeDataPager implements DataPager {
-    	GreenDataAdapter<YouTubeItem> mAdapter;
-		@Override
-		public DataQuery buildFirstPageQuery(DataQuery query) {
-			query.getParams().put("start-index", "1");
-			return query;
-		}
+	@Override
+	public DataQuery getNextPageQuery() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-		@Override
-		public DataQuery buildNextPageQuery(DataQuery query) {
-//			query.getParams().put("start-index", value);
-			return null;
-		}
+	@Override
+	public DataQuery getPreviousPageQuery() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-		@Override
-		public DataQuery buildPreviousPageQuery(DataQuery query) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+	@Override
+	public DataQuery getRefreshQuery() {
+		final DataQuery currentQuery = getCurrentQuery();
+		currentQuery.putParam("start-index", "1");
+		return currentQuery;
+	}
 
-		@Override
-		public DataQuery buildRefreshQuery(DataQuery query) {
-			return buildFirstPageQuery(query);
-		}
-    }
-    
-    private final class YouTubeDataAdapter extends GreenDataAdapter<YouTubeItem> {
-
-		public YouTubeDataAdapter(Context context) {
-			super(context);
-			// TODO Auto-generated constructor stub
-		}
-
-		@Override
-		public DataQuery buildFirstPageQuery(DataQuery query) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public DataQuery buildNextPageQuery(DataQuery query) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public DataQuery buildPreviousPageQuery(DataQuery query) {
-			DataQuery currentQuery = getCurrentQuery();
-			final TreeMap<String, String> params = currentQuery.getParams();
-			params.put("start-index", "1");
-			return currentQuery;
-		}
-
-		@Override
-		public DataQuery buildRefreshQuery(DataQuery query) {
-			DataQuery currentQuery = getCurrentQuery();
-			final TreeMap<String, String> params = currentQuery.getParams();
-			params.put("start-index", "1");
-			return currentQuery;
-		}
-
-    	
-    }
+	@Override
+	public DataQuery getLoadMoreQuery() {
+		final DataQuery currentQuery = getCurrentQuery();
+		String startIndex = currentQuery.getParam("start-index");
+		String maxResults = currentQuery.getParam("max-results");
+		startIndex = String.valueOf(Integer.valueOf(startIndex) + Integer.valueOf(maxResults));
+		currentQuery.putParam("start-index", startIndex);
+		currentQuery.putParam("max-results", maxResults);
+		return currentQuery;
+	}
     
 }

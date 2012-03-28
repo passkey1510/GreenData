@@ -12,7 +12,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:name=".GreenDataDemoListActivity"
+            android:name=".ListSamples"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,7 +20,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+		<activity
+            android:name="com.greendata.demo.GreenDataYouTubeListActivity"
+            android:label="YouTube API demo">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.greendata.demo.SAMPLE" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.greendata.demo.GreenDataTwitterListActivity"
+            android:label="Twitter API demo">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.greendata.demo.SAMPLE" />
+            </intent-filter>
+        </activity>
         <service
             android:name="com.greendata.data.service.DataService"
             android:exported="false" />

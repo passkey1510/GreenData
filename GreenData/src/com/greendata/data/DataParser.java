@@ -2,6 +2,10 @@ package com.greendata.data;
 
 import android.os.Parcelable;
 
-public interface DataParser {
-	public DataResults<? extends Parcelable> parseResult(String wsResponse);
+public abstract class DataParser {
+	public DataResults<? extends Parcelable> parseResult(String wsResponse) {
+		DataResults<? extends Parcelable> results = new DataResults<Parcelable>();
+		results.setRawResponse(wsResponse);
+		return results;
+	}
 }

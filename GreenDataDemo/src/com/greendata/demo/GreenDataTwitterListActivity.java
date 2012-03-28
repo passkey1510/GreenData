@@ -34,17 +34,41 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class GreenDataTweetListActivity extends GreenDataListActivity<TweetItem> {
+public class GreenDataTwitterListActivity extends GreenDataListActivity<TweetItem> {
+
+	@Override
+	public DataQuery getNextPageQuery() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DataQuery getPreviousPageQuery() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DataQuery getRefreshQuery() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public DataQuery getLoadMoreQuery() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TreeMap<String, String> params = new TreeMap<String, String>();
-        params.put("start-index", "1");
-        params.put("max-results", "5");
-        params.put("alt", "jsonc");
-        params.put("v", "2");
+        params.put("q", "android");
+//        params.put("max-results", "5");
+//        params.put("alt", "jsonc");
+//        params.put("v", "2");
         DataQuery query = new DataQuery(params);
         
 //        DataWorker worker = new DataWorker("http://gdata.youtube.com/feeds/api/standardfeeds/top_rated", parser);
@@ -52,36 +76,34 @@ public class GreenDataTweetListActivity extends GreenDataListActivity<TweetItem>
 //        doGetList(query);
         GreenDataAdapter<TweetItem> adapter = new GreenDataAdapter<TweetItem>(this);
         setListAdapter(adapter);
-        doGetList(new GreenRequest("http://gdata.youtube.com/feeds/api/standardfeeds/top_rated", params, new DataParser() {
+        doGetList(new GreenRequest("http://search.twitter.com/search.json", params, new DataParser() {
 			
 			@Override
-			public DataResults<YouTubeItem> parseResult(String wsResponse) {
-				final ArrayList<YouTubeItem> videoList = new ArrayList<YouTubeItem>();
+			public DataResults<TweetItem> parseResult(String wsResponse) {
+				DataResults<TweetItem> tweetResults = (DataResults<TweetItem>) super.parseResult(wsResponse);
+				final ArrayList<TweetItem> tweetList = new ArrayList<TweetItem>();
 				try{
 					final JSONObject parser = new JSONObject(wsResponse);
-					final JSONObject root = parser.getJSONObject("data");
-					final JSONArray itemArray = root.getJSONArray("items");
+//					final JSONObject root = parser.getJSONObject("data");
+					final JSONArray itemArray = parser.getJSONArray("results");
 					final int size = itemArray.length();
 					for (int i = 0; i < size; i++) {
 						final JSONObject item = itemArray.getJSONObject(i);
-						final YouTubeItem video = new YouTubeItem();
-						video.setVideoID(item.getString("id"));
-						video.setTitle(item.getString("title"));
+						final TweetItem tweet = new TweetItem();
+						tweet.setTitle(item.getString("text"));
+						tweet.setID(item.getString("id_str"));
 	//					final JSONObject thumbnailObject = item
 	//							.getJSONObject(JSONTag.YOUTUBE_THUMBNAIL);
 	//					video.setThumbnailUrl(thumbnailObject
 	//							.getString(JSONTag.YOUTUBE_THUMBNAIL_SQ));
-						videoList.add(video);
+						tweetList.add(tweet);
 					}
-					final int totalItem = root.getInt("totalItems");
-					final int offset = root.getInt("startIndex");
-					final int limit = root.getInt("itemsPerPage");
-					DataResults<YouTubeItem> mediaResults = new DataResults<YouTubeItem>();
-					mediaResults.setList(videoList);
-					mediaResults.setTotalItem(totalItem);
-					mediaResults.setOffset(offset);
-					mediaResults.setLimit(limit);
-					return mediaResults;
+					
+					tweetResults.setList(tweetList);
+//					mediaResults.setTotalItem(totalItem);
+//					mediaResults.setOffset(offset);
+//					mediaResults.setLimit(limit);
+					return tweetResults;
 				}
 				catch(JSONException exception){
 					return null;

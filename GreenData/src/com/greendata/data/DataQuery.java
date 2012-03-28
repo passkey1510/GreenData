@@ -17,6 +17,10 @@ public class DataQuery {
 		mParams.put(key, value);
 	}
 
+	public String getParam(String key) {
+		return mParams.get(key);
+	}
+
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;

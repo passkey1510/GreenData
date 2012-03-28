@@ -19,7 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public abstract class GreenDataAdapter<E extends Parcelable> extends BaseAdapter implements DataPager{
+public class GreenDataAdapter<E extends Parcelable> extends BaseAdapter {
 	public static final int UNLIMITED = -1;
 	private Context mContext;
 	private FileInputStream fis;
@@ -27,26 +27,28 @@ public abstract class GreenDataAdapter<E extends Parcelable> extends BaseAdapter
 	private LayoutInflater mInflater;
 	private List<E> mList;
 	private int mMaximumItemCount = UNLIMITED;
-	private DataQuery mCurrentQuery = new DataQuery(new TreeMap<String, String>());
-	
+	private DataQuery mCurrentQuery = new DataQuery(
+			new TreeMap<String, String>());
+
 	public GreenDataAdapter(Context context) {
 		initialize(context, new ArrayList<E>());
 	}
-	
-	public GreenDataAdapter(Context context, List<E> list){
+
+	public GreenDataAdapter(Context context, List<E> list) {
 		initialize(context, list);
 	}
-	
-	public void initialize(Context context, List<E> list){
+
+	public void initialize(Context context, List<E> list) {
 		mContext = context;
-		mInflater = (LayoutInflater)context.getSystemService(Service.LAYOUT_INFLATER_SERVICE);
+		mInflater = (LayoutInflater) context
+				.getSystemService(Service.LAYOUT_INFLATER_SERVICE);
 		mList = list;
 	}
 
 	public DataQuery getCurrentQuery() {
 		return mCurrentQuery;
 	}
-	
+
 	public int getMaximumItemCount() {
 		return mMaximumItemCount;
 	}
@@ -54,7 +56,7 @@ public abstract class GreenDataAdapter<E extends Parcelable> extends BaseAdapter
 	public void setMaximumItemCount(int maximumItemCount) {
 		mMaximumItemCount = maximumItemCount;
 	}
-	
+
 	@Override
 	public int getCount() {
 		return mList.size();
@@ -70,28 +72,28 @@ public abstract class GreenDataAdapter<E extends Parcelable> extends BaseAdapter
 		return position;
 	}
 
-//	@Override
-//	public View getView(int position, View convertView, ViewGroup parent) {
-//		return null;
-//	}
-	
+	// @Override
+	// public View getView(int position, View convertView, ViewGroup parent) {
+	// return null;
+	// }
+
 	public void addAll(int index, List<E> list) {
 		mList.addAll(index, list);
 	}
-	
+
 	public void appendAll(List<E> list) {
 		mList.addAll(list);
 	}
-	
+
 	public void prependAll(List<E> list) {
 		addAll(0, list);
 	}
-	
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		TextView textView = new TextView(mContext);
 		textView.setText(mList.get(position).toString());
 		textView.setHeight(90);
-    	return textView;
+		return textView;
 	}
 }

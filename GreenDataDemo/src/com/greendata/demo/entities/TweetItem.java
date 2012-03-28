@@ -25,7 +25,7 @@ public class TweetItem implements Parcelable {
 		dest.writeString(mTitle);
 	}
 
-	public void setVideoID(String id) {
+	public void setID(String id) {
 		mId = id;
 	}
 

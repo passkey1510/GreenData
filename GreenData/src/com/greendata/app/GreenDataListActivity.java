@@ -29,7 +29,7 @@ import android.widget.ListView;
 
 import com.greendata.app.GreenDataActivity.OnRequestDataListener;
 
-public class GreenDataListActivity<E extends Parcelable> extends
+public abstract class GreenDataListActivity<E extends Parcelable> extends
 		GreenDataActivity implements OnRequestDataListener {
 	private static final int DEFAULT_THRESHOLD = 5;
 	private RefreshAndLoadMoreListView mListView;
@@ -113,14 +113,15 @@ public class GreenDataListActivity<E extends Parcelable> extends
 
 			@Override
 			public void onRefresh() {
-//				final TreeMap<String, String> refreshParams = new TreeMap<String, String>();
-//				refreshParams.put("v", "2");
-//				refreshParams.put("alt", "jsonc");
-//				refreshParams.put("start-index", "1");
-//				refreshParams.put("max-results", String.valueOf(mThreshold));
-//				DataQuery refreshQuery = new DataQuery(refreshParams);
-				DataQuery refreshQuery = mAdapter.buildRefreshQuery(null);
-				doGetList(refreshQuery);
+				// final TreeMap<String, String> refreshParams = new
+				// TreeMap<String, String>();
+				// refreshParams.put("v", "2");
+				// refreshParams.put("alt", "jsonc");
+				// refreshParams.put("start-index", "1");
+				// refreshParams.put("max-results", String.valueOf(mThreshold));
+				// DataQuery refreshQuery = new DataQuery(refreshParams);
+//				DataQuery refreshQuery = mAdapter.buildRefreshQuery(null);
+				doGetList(getRefreshQuery());
 			}
 		});
 
@@ -129,15 +130,15 @@ public class GreenDataListActivity<E extends Parcelable> extends
 			@Override
 			public void onLoadMore() {
 				int itemCount = mAdapter.getCount();
-				final TreeMap<String, String> loadMoreParams = new TreeMap<String, String>();
-				loadMoreParams.put("v", "2");
-				loadMoreParams.put("alt", "jsonc");
-				loadMoreParams.put("start-index", String.valueOf(++itemCount));
-				loadMoreParams.put("max-results", String.valueOf(mThreshold));
-				DataQuery loadMoreQuery = new DataQuery(loadMoreParams);
+//				final TreeMap<String, String> loadMoreParams = new TreeMap<String, String>();
+//				loadMoreParams.put("v", "2");
+//				loadMoreParams.put("alt", "jsonc");
+//				loadMoreParams.put("start-index", String.valueOf(++itemCount));
+//				loadMoreParams.put("max-results", String.valueOf(mThreshold));
+//				DataQuery loadMoreQuery = new DataQuery(loadMoreParams);
 				if (mAdapter.getMaximumItemCount() == GreenDataAdapter.UNLIMITED
 						|| itemCount < mAdapter.getMaximumItemCount()) {
-					doGetList(loadMoreQuery);
+					doGetList(getLoadMoreQuery());
 				} else {
 					mListView.completeLoadMore();
 				}
@@ -206,7 +207,7 @@ public class GreenDataListActivity<E extends Parcelable> extends
 	public void onGetDataCompleted(DataResults results) {
 		List<E> items = results.getList();
 		final boolean isRefreshing = mListView.getIsRefreshing();
-		mAdapter.setMaximumItemCount(results.getTotalItem());
+		mAdapter.setMaximumItemCount(100);
 		// int index = 0;
 		// for (E e : items) {
 		if (isRefreshing) {
@@ -232,6 +233,7 @@ public class GreenDataListActivity<E extends Parcelable> extends
 	}
 
 	protected void doGetList(DataQuery dataQuery) {
+		setCurrentQuery(dataQuery);
 		super.doGetData(mWorker, dataQuery);
 	}
 
@@ -243,6 +245,14 @@ public class GreenDataListActivity<E extends Parcelable> extends
 		}
 		doGetList(query);
 	}
+
+	public abstract DataQuery getNextPageQuery();
+
+	public abstract DataQuery getPreviousPageQuery();
+
+	public abstract DataQuery getRefreshQuery();
+
+	public abstract DataQuery getLoadMoreQuery();
 
 	private AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
 		public void onItemClick(AdapterView<?> parent, View v, int position,

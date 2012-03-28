@@ -18,7 +18,9 @@ public class GreenDataActivity extends Activity implements
 	private GreenDataRequestManager mRequestManager;
 	private OnRequestDataListener mOnRequestDataListener;
 	protected int mRequestId;
-
+	private String mRawResponse;
+	private DataQuery mCurrentQuery;
+	
 	public interface OnRequestDataListener {
 		public void onGetData();
 
@@ -65,13 +67,26 @@ public class GreenDataActivity extends Activity implements
 					// showDialog(DialogConfig.DIALOG_CONNEXION_ERROR);
 				}
 			} else {
+				final DataResults dataResults = (DataResults) payload.getParcelable("results");
+				mRawResponse = dataResults.getRawResponse();
 				mOnRequestDataListener
-						.onGetDataCompleted((DataResults) payload
-								.getParcelable("results"));
+						.onGetDataCompleted(dataResults);
 			}
 		}
 	}
 
+	public String getRawResponse() {
+		return mRawResponse;
+	}
+	
+	public void setCurrentQuery(DataQuery query) {
+		mCurrentQuery = query;
+	}
+	
+	public DataQuery getCurrentQuery() {
+		return mCurrentQuery;
+	}
+	
 	protected void doGetData(DataWorker worker, DataQuery query) {
 		mRequestManager.addOnRequestFinishedListener(this);
 		if (mOnRequestDataListener != null) {

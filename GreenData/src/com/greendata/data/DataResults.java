@@ -7,13 +7,22 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class DataResults<E extends Parcelable> implements Parcelable {
+	private String mRawResponse;
 	private List<E> mList;
-	private int mTotalItem;
-	private int mOffset;
-	private int mLimit;
+//	private int mTotalItem;
+//	private int mOffset;
+//	private int mLimit;
 	
 	public DataResults(){
 		super();
+	}
+	
+	public String getRawResponse() {
+		return mRawResponse;
+	}
+	
+	public void setRawResponse(String rawResponse) {
+		mRawResponse = rawResponse;
 	}
 	
 	public List<E> getList() {
@@ -24,29 +33,31 @@ public class DataResults<E extends Parcelable> implements Parcelable {
 		mList = list;
 	}
 	
-	public void setTotalItem(int totalItem) {
-		mTotalItem = totalItem;
-	}
+//	public void setTotalItem(int totalItem) {
+//		mTotalItem = totalItem;
+//	}
+//	
+//	public int getTotalItem() {
+//		return mTotalItem;
+//	}
+//	
+//	public void setOffset(int offset) {
+//		mOffset = offset;
+//	}
+//	
+//	public int getOffset() {
+//		return mOffset;
+//	}
+//	
+//	public void setLimit(int limit) {
+//		mLimit = limit;
+//	}
+//	
+//	public int getLimit() {
+//		return mLimit;
+//	}
 	
-	public int getTotalItem() {
-		return mTotalItem;
-	}
 	
-	public void setOffset(int offset) {
-		mOffset = offset;
-	}
-	
-	public int getOffset() {
-		return mOffset;
-	}
-	
-	public void setLimit(int limit) {
-		mLimit = limit;
-	}
-	
-	public int getLimit() {
-		return mLimit;
-	}
 	@Override
 	public int describeContents() {
 		// TODO Auto-generated method stub
@@ -57,17 +68,19 @@ public class DataResults<E extends Parcelable> implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		// TODO Auto-generated method stub
 //		dest.writeParcelableArray(mList, flags);
+		dest.writeString(mRawResponse);
 		dest.writeList(mList);
-		dest.writeInt(mTotalItem);
-		dest.writeInt(mOffset);
-		dest.writeInt(mLimit);
+//		dest.writeInt(mTotalItem);
+//		dest.writeInt(mOffset);
+//		dest.writeInt(mLimit);
 	}
 	
-	private DataResults(Parcel in) {
+	protected DataResults(Parcel in) {
+		mRawResponse = in.readString();
 		in.readList(mList, null);
-		mTotalItem = in.readInt();
-		mOffset = in.readInt();
-		mLimit = in.readInt();
+//		mTotalItem = in.readInt();
+//		mOffset = in.readInt();
+//		mLimit = in.readInt();
 	}
 	
 	public static final Parcelable.Creator<DataResults> CREATOR = new Parcelable.Creator<DataResults>() {
